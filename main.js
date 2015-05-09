@@ -6,22 +6,22 @@
         ctx = canvas.getContext("2d");
         canvas.onmousedown = function(event) {
             if (isMobile) {
-                var b = event.clientX - (5 + m / 5 / 2),
-                    c = event.clientY - (5 + m / 5 / 2);
-                if (Math.sqrt(b * b + c * c) <= m / 5 / 2) {
+                var b = event.clientX - (5 + windowWidth / 5 / 2),
+                    c = event.clientY - (5 + windowWidth / 5 / 2);
+                if (Math.sqrt(b * b + c * c) <= windowWidth / 5 / 2) {
                     sendMousePosition();
                     sendCommand(17);
                     return
                 }
             }
-            J = event.clientX;
-            K = event.clientY;
+            clientX = event.clientX;
+            clientY = event.clientY;
             T();
             sendMousePosition()
         };
         canvas.onmousemove = function(a) {
-            J = a.clientX;
-            K = a.clientY;
+            clientX = a.clientX;
+            clientY = a.clientY;
             T()
         };
         canvas.onmouseup = function(a) {};
@@ -89,8 +89,8 @@
     }
 
     function T() {
-        L = (J - m / 2) / s + x;
-        M = (K - p / 2) / s + y
+        L = (clientX - windowWidth / 2) / s + x;
+        M = (clientY - windowHeight / 2) / s + y
     }
 
     function updateServerList() {
@@ -256,14 +256,14 @@
                     255 * 360,
                     m = (l >> 8 & 255) / 255,
                     l = (l >> 0 & 255) / 255;
-                if (0 == m) l = l << 16 | l << 8 | l << 0;
+                if (0 == windowWidth) l = l << 16 | l << 8 | l << 0;
                 else {
                     var k = k / 60,
                         g = ~~k,
                         u = k - g,
-                        k = l * (1 - m),
-                        s = l * (1 - m * u),
-                        m = l * (1 - m * (1 - u)),
+                        k = l * (1 - windowWidth),
+                        s = l * (1 - windowWidth * u),
+                        m = l * (1 - windowWidth * (1 - u)),
                         p = u = 0,
                         q = 0;
                     switch (g % 6) {
@@ -328,8 +328,8 @@
 
     function sendMousePosition() {
         if (null != h && socket.readyState == socket.OPEN) {
-            var a = J - m / 2,
-                b = K - p / 2;
+            var a = clientX - windowWidth / 2,
+                b = clientY - windowHeight / 2;
             64 > a * a + b * b || qa == L && ra == M || (qa = L, ra = M, a = new ArrayBuffer(21), b = new DataView(a), b.setUint8(0, 16), b.setFloat64(1, L, true), b.setFloat64(9, M, true), b.setUint32(17, 0, true), socket.send(a))
         }
     }
@@ -358,17 +358,17 @@
     }
 
     function onResize() {
-        m = window.innerWidth;
-        p = window.innerHeight;
-        canvas2.width = canvas.width = m;
-        canvas2.height = canvas.height = p;
+        windowWidth = window.innerWidth;
+        windowHeight = window.innerHeight;
+        canvas2.width = canvas.width = windowWidth;
+        canvas2.height = canvas.height = windowHeight;
         redraw()
     }
 
     function Aa() {
         if (0 != n.length) {
             for (var a = 0, b = 0; b < n.length; b++) a += n[b].size;
-            a = Math.pow(Math.min(64 / a, 1), .4) * Math.max(p / 965, m / 1920);
+            a = Math.pow(Math.min(64 / a, 1), .4) * Math.max(p / 965, windowWidth / 1920);
             s = (9 * s + a) / 10
         }
     }
@@ -385,16 +385,16 @@
         }
         va();
         T();
-        ctx.clearRect(0, 0, m, p);
+        ctx.clearRect(0, 0, windowWidth, windowHeight);
         ctx.fillStyle =
-            ba ? "#111111" : "#F2FBFF";
-        ctx.fillRect(0, 0, m, p);
+            isDarkTheme ? "#111111" : "#F2FBFF";
+        ctx.fillRect(0, 0, windowWidth, windowHeight);
         ctx.save();
-        ctx.strokeStyle = ba ? "#AAAAAA" : "#000000";
+        ctx.strokeStyle = isDarkTheme ? "#AAAAAA" : "#000000";
         ctx.globalAlpha = .2;
         ctx.scale(s, s);
-        b = m / s;
-        c = p / s;
+        b = windowWidth / s;
+        c = windowHeight / s;
         for (f = -.5 + (-x + b / 2) % 50; f < b; f += 50) ctx.beginPath(), ctx.moveTo(f, 0), ctx.lineTo(f, c), ctx.stroke();
         for (f = -.5 + (-y + c / 2) % 50; f < c; f += 50) ctx.beginPath(), ctx.moveTo(0, f), ctx.lineTo(b, f), ctx.stroke();
         ctx.restore();
@@ -402,15 +402,15 @@
             return a.size == b.size ? a.id - b.id : a.size - b.size
         });
         ctx.save();
-        ctx.translate(m / 2, p / 2);
+        ctx.translate(windowWidth / 2, windowHeight / 2);
         ctx.scale(s, s);
         ctx.translate(-x, -y);
         for (f = 0; f < E.length; f++) E[f].draw();
         for (f = 0; f < r.length; f++) r[f].draw();
         ctx.restore();
-        A && 0 != q.length && ctx.drawImage(A, m - A.width - 10, 10);
+        A && 0 != q.length && ctx.drawImage(A, windowWidth - A.width - 10, 10);
         I = Math.max(I, Ca());
-        0 != I && (null == O && (O = new P(24, "#FFFFFF")), O.setValue("Score: " + ~~(I / 100)), c = O.render(), b = c.width, ctx.globalAlpha = .2, ctx.fillStyle = "#000000", ctx.fillRect(10, p - 10 - 24 - 10, b + 10, 34), ctx.globalAlpha = 1, ctx.drawImage(c, 15, p - 10 - 24 - 5));
+        0 != I && (null == O && (O = new P(24, "#FFFFFF")), O.setValue("Score: " + ~~(I / 100)), c = O.render(), b = c.width, ctx.globalAlpha = .2, ctx.fillStyle = "#000000", ctx.fillRect(10, windowHeight - 10 - 24 - 10, b + 10, 34), ctx.globalAlpha = 1, ctx.drawImage(c, 15, windowHeight - 10 - 24 - 5));
         Da();
         a = +new Date - a;
         a > 1E3 / 60 ? w -= .01 : a < 1E3 / 65 && (w += .01);.4 > w && (w = .4);
@@ -419,7 +419,7 @@
 
     function Da() {
         if (isMobile && ca.width) {
-            var a = m / 5;
+            var a = windowWidth / 5;
             ctx.drawImage(ca, 5, 5, a, a)
         }
     }
@@ -431,11 +431,11 @@
 
     function na() {
         if (0 != q.length)
-            if (Q) {
+            if (isNamesOn) {
                 A = document.createElement("canvas");
                 var a = A.getContext("2d"),
                     b = 60 + 24 * q.length,
-                    c = Math.min(200, .3 * m) / 200;
+                    c = Math.min(200, .3 * windowWidth) / 200;
                 A.width = 200 * c;
                 A.height = b * c;
                 a.scale(c, c);
@@ -449,7 +449,7 @@
                 a.font = "30px Ubuntu";
                 a.fillText(c, 100 - a.measureText(c).width / 2, 40);
                 a.font = "20px Ubuntu";
-                for (b = 0; b < q.length; ++b) c = q[b].name || "An unnamed cell", -1 != n.indexOf(q[b].id) && (c = n[0].name), Q || 0 != n.length &&
+                for (b = 0; b < q.length; ++b) c = q[b].name || "An unnamed cell", -1 != n.indexOf(q[b].id) && (c = n[0].name), isNamesOn || 0 != n.length &&
                     n[0].name == c || (c = "An unnamed cell"), c = b + 1 + ". " + c, a.fillText(c, 100 - a.measureText(c).width / 2, 70 + 24 * b)
             } else A = null
     }
@@ -492,8 +492,8 @@
             r = [],
             E = [],
             q = [],
-            J = 0,
-            K = 0,
+            clientX = 0,
+            clientY = 0,
             L = -1,
             M = -1,
             Ba = 0,
@@ -505,13 +505,13 @@
             $ = 1E4,
             s = 1,
             W = null,
-            sa = true,
-            Q = true,
-            da = false,
+            isSkinsOn = true,
+            isNamesOn = true,
+            isColorsOn = false,
             aa = false,
             I = 0,
-            ba = false,
-            ta = false,
+            isDarkTheme = false,
+            isShowMassOn = false,
             isMobile = "ontouchstart" in g && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
             ca = new Image;
         ca.src = "img/split.png";
@@ -525,19 +525,19 @@
         };
         window.setRegion = ia;
         window.setSkins = function(a) {
-            sa = a
+            isSkinsOn = a
         };
         window.setNames = function(a) {
-            Q = a
+            isNamesOn = a
         };
         window.setDarkTheme = function(a) {
-            ba = a
+            isDarkTheme = a
         };
         window.setColors = function(a) {
-            da = a
+            isColorsOn = a
         };
         window.setShowMass = function(a) {
-            ta = a
+            isShowMassOn = a
         };
         window.connect = connectSocket;
         var qa = -1,
@@ -668,7 +668,7 @@
                 return a
             },
             shouldRender: function() {
-                return this.x + this.size + 40 < x - m / 2 / s || this.y + this.size + 40 < y - p / 2 / s || this.x - this.size - 40 > x + m / 2 / s || this.y - this.size - 40 > y + p / 2 / s ? false : true
+                return this.x + this.size + 40 < x - windowWidth / 2 / s || this.y + this.size + 40 < y - windowHeight / 2 / s || this.x - this.size - 40 > x + windowWidth / 2 / s || this.y - this.size - 40 > y + windowHeight / 2 / s ? false : true
             },
             draw: function() {
                 if (this.shouldRender()) {
@@ -677,7 +677,7 @@
                     var a = this.updatePos();
                     this.destroyed && (ctx.globalAlpha *= 1 - a);
                     this.movePoints();
-                    da ? (ctx.fillStyle = "#FFFFFF", ctx.strokeStyle = "#AAAAAA") : (ctx.fillStyle = this.color, ctx.strokeStyle = this.color);
+                    isColorsOn ? (ctx.fillStyle = "#FFFFFF", ctx.strokeStyle = "#AAAAAA") : (ctx.fillStyle = this.color, ctx.strokeStyle = this.color);
                     ctx.beginPath();
                     ctx.lineWidth = 10;
                     ctx.lineCap = "round";
@@ -690,18 +690,18 @@
                     }
                     ctx.closePath();
                     a = this.name.toLowerCase();
-                    sa ? -1 != Ea.indexOf(a) ? (R.hasOwnProperty(a) || (R[a] = new Image, R[a].src = "skins/" + a + ".png"), b = R[a]) : b = null : b = null;
+                    isSkinsOn ? -1 != Ea.indexOf(a) ? (R.hasOwnProperty(a) || (R[a] = new Image, R[a].src = "skins/" + a + ".png"), b = R[a]) : b = null : b = null;
                     a = b ? -1 != Fa.indexOf(a) : false;
                     ctx.stroke();
                     ctx.fill();
                     null != b && 0 < b.width && !a && (ctx.save(), ctx.clip(), ctx.drawImage(b, this.x - this.size, this.y - this.size, 2 * this.size, 2 * this.size), ctx.restore());
-                    if (da || 15 < this.size) ctx.strokeStyle = "#000000", ctx.globalAlpha *= .1, ctx.stroke();
+                    if (isColorsOn || 15 < this.size) ctx.strokeStyle = "#000000", ctx.globalAlpha *= .1, ctx.stroke();
                     ctx.globalAlpha = 1;
                     null != b && 0 < b.width && a && ctx.drawImage(b, this.x - 2 * this.size, this.y - 2 * this.size, 4 * this.size, 4 * this.size);
                     a = -1 != n.indexOf(this);
                     b = ~~this.y;
-                    (Q || a) && this.name && this.nameCache && (c = this.nameCache.render(), ctx.drawImage(c, ~~this.x - ~~(c.width / 2), b - ~~(c.height / 2)), b += c.height / 2 + 4);
-                    ta && a && (null == this.sizeCache && (this.sizeCache = new P(this.getNameSize() / 2, "#FFFFFF", true, "#000000")), this.sizeCache.setSize(this.getNameSize() / 2), this.sizeCache.setValue(~~(this.size * this.size / 100)), c = this.sizeCache.render(), ctx.drawImage(c, ~~this.x - ~~(c.width / 2), b - ~~(c.height / 2)));
+                    (isNamesOn || a) && this.name && this.nameCache && (c = this.nameCache.render(), ctx.drawImage(c, ~~this.x - ~~(c.width / 2), b - ~~(c.height / 2)), b += c.height / 2 + 4);
+                    isShowMassOn && a && (null == this.sizeCache && (this.sizeCache = new P(this.getNameSize() / 2, "#FFFFFF", true, "#000000")), this.sizeCache.setSize(this.getNameSize() / 2), this.sizeCache.setValue(~~(this.size * this.size / 100)), c = this.sizeCache.render(), ctx.drawImage(c, ~~this.x - ~~(c.width / 2), b - ~~(c.height / 2)));
                     ctx.restore()
                 }
             }
