@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^3.8.0",
+    "request": "^2.55.0",
     "ws": "^0.7.1"
   }
 }
