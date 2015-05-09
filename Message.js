@@ -1,8 +1,8 @@
 var MESSAGE_TYPES = {
   ELEMENTS: 16, // ???
+  DUNNO: 17, // ???
   RESET: 20, // ???
   DUNNO: 32, // ???
-  DUNNO: 48, // ???
   LEADER_BOARD: 49, // ???
   DUNNO: 64
 };
