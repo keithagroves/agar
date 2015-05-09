@@ -85,6 +85,7 @@ Session.prototype.onSocketError = function onSocketError(error) {
   console.log('Socket error: ', error.message);
 };
 
+// TODO(ibash) make a game parser module...
 Session.prototype.onSocketMessage = function onSocketMessage(data, flags) {
   //console.log('got on socket message');
   //console.log(JSON.stringify(arguments, null, 2));
@@ -94,10 +95,10 @@ Session.prototype.onSocketMessage = function onSocketMessage(data, flags) {
   var view =  new DataView(toArrayBuffer(data));
       console.log(view.getUint8(0));
   switch (view.getUint8(0)) {
-    //case 16:
+    case 16:
       //TODO(ibash) parse player message
-        //za(f);
-        //break;
+      this.parsePlayerMessage(view);
+      break;
     //case 20:
       // TODO(ibash) reset
         //n = [];
@@ -146,56 +147,100 @@ Session.prototype.parseLeaderBoard = function parseLeaderBoard(view) {
   }
 
   console.log(leaders);
-}
+};
 
-    function onSocketMessage(a) {
-        function b() {
-            for (var a = "";;) {
-                var b = f.getUint16(c, true);
-                c += 2;
-                if (0 == b) break;
-                a += String.fromCharCode(b)
-            }
-            return a
-        }
-        var c = 1,
-            f = new DataView(a.data);
-        switch (f.getUint8(0)) {
-            case 16:
-                za(f);
-                break;
-            case 20:
-                n = [];
-                D = [];
-                break;
-            case 32:
-                D.push(f.getUint32(1, true));
-                break;
-            case 48:
-                for (q = []; c < f.byteLength;) q.push({
-                    id: 0,
-                    name: b()
-                });
-                na();
-                break;
-            case 49:
-                a = f.getUint32(c, true);
-                c += 4;
-                q = [];
-                for (var d = 0; d < a; ++d) {
-                    var e = f.getUint32(c, true),
-                        c = c + 4;
-                    q.push({
-                        id: e,
-                        name: b()
-                    })
-                }
-                na();
-                break;
-            case 64:
-                X = f.getFloat64(1, true), Y = f.getFloat64(9, true), Z = f.getFloat64(17, true), $ = f.getFloat64(25, true), 0 == n.length && (x = (Z + X) / 2, y = ($ + Y) / 2)
-        }
+Session.prototype.parsePlayerMessage = function parsePlayerMessage(view) {
+  var offset = 1;
+
+  // TODO(ibash) I think the first for loop below is for one player eating
+  // another...
+  var count = view.getUint16(offset, true);
+  offset += 2;
+  console.log('count for destroying: ', count);
+  for (var i = 0; i < count; i++) {
+    var id1 = view.getUint32(offset, true);
+    var id2 = view.getUint32(offset + 4, true);
+    offset += 8;
+
+    // TODO(ibash) player with id2 is destroyed
+    // In the below code, e is the player object for id1 and t is the player
+    // object for id2 ...
+    //if (id1 && id2) {
+      //t.destroy();
+      //t.ox = t.x;
+      //t.oy = t.y;
+      //t.oSize = t.size;
+      //t.nx = e.x;
+      //t.ny = e.y;
+      //t.nSize = t.size;
+      //t.updateTime = F;
+    //}
+    console.log('id1, id2', id1, id2);
+  }
+
+  // Parse the rest of the players
+  while (true) {
+    var id = view.getUint32(offset, true);
+    offset += 4;
+
+    // Done processing this message...
+    if (id === 0) {
+      break;
     }
+
+    var x = view.getFloat64(offset, true),
+    offset += 8;
+    var y = view.getFloat64(offset, true),
+    offset += 8;
+    var size = view.getFloat64(offset, true),
+    offset += 8;
+    var color = view.getUint8(offset),
+    offset += 1;
+    var isVirus = false;
+    if (color === 0) {
+      isVirus = true;
+      // TODO(ibash) set a default color for the virus
+    } else if (color === 255) {
+      // TODO(ibash) I think it's parsing the color for a food item
+      var red = view.getUint8(offset);
+      offset += 1;
+      var green = view.getUint8(offset);
+      offset += 1;
+      var blue = view.getUint8(offset);
+      offset += 1;
+      color = numberToColorHex(red << 16 | green << 8 | blue);
+
+      // TODO(ibash) unsure what this is doing...
+      var g = view.getUint8(offset);
+      offset += 1;
+      var h = !!(g & 1);
+      if (g & 2) {
+        offset += 4;
+      }
+      if (g & 4) {
+        offset += 8;
+      }
+      if (g & 8) {
+        offset += 16;
+      }
+    } else {
+      // TODO(ibash) some more complicated stuff to parse the color for the
+      // player
+    }
+
+    // TODO(ibash) parse the name
+  }
+};
+
+function numberToColorHex(number) {
+  var color = number.toString(16);
+  
+  while (color.length < 6) {
+    color = '0' + color;
+  }
+
+  return '#' + color;
+}
 
 Session.prototype.onSocketUnexpectedResponse = function onSocketUnexpectedResponse() {
   console.log('got on socket unexpected response');
