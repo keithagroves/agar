@@ -2,9 +2,9 @@
     function ya() {
         ia();
         setInterval(ia, 18E4);
-        z = canvas = document.getElementById("canvas");
-        e = z.getContext("2d");
-        z.onmousedown = function(a) {
+        canvas2 = canvas = document.getElementById("canvas");
+        e = canvas2.getContext("2d");
+        canvas2.onmousedown = function(a) {
             if (ja) {
                 var b = a.clientX - (5 + p / 5 / 2), c = a.clientY - (5 + p / 5 / 2);
                 if (Math.sqrt(b * b + c * c) <= p / 5 / 2) {
@@ -18,12 +18,12 @@
             aa();
             G()
         };
-        z.onmousemove = function(a) {
+        canvas2.onmousemove = function(a) {
             O = a.clientX;
             P = a.clientY;
             aa()
         };
-        z.onmouseup = function(a) {
+        canvas2.onmouseup = function(a) {
         };
         var a = !1, b = !1, c = !1;
         f.onkeydown = function(d) {
@@ -280,8 +280,8 @@
     function ka() {
         p = f.innerWidth;
         m = f.innerHeight;
-        canvas.width = z.width = p;
-        canvas.height = z.height = m;
+        canvas.width = canvas2.width = p;
+        canvas.height = canvas2.height = m;
         ba()
     }
     function Ea() {
@@ -408,7 +408,7 @@
     else {
       var canvas,
           e,
-          z,
+          canvas2,
           p,
           m,
           H = null,
