@@ -1,7 +1,7 @@
-(function(f, r) {
-    function ya() {
-        ia();
-        setInterval(ia, 18E4);
+(function(window, $) {
+    function onload() {
+        getServerInfo();
+        setInterval(getServerInfo, 18E4);
         canvas2 = canvas = document.getElementById("canvas");
         e = canvas2.getContext("2d");
         canvas2.onmousedown = function(a) {
@@ -26,27 +26,27 @@
         canvas2.onmouseup = function(a) {
         };
         var a = !1, b = !1, c = !1;
-        f.onkeydown = function(d) {
+        window.onkeydown = function(d) {
             32 != d.keyCode || a || (G(), A(17), a = !0);
             81 != d.keyCode || b || (A(18), b = !0);
             87 != d.keyCode || c || (G(), A(21), c = !0);
-            27 == d.keyCode && r("#overlays").fadeIn(200)
+            27 == d.keyCode && $("#overlays").fadeIn(200)
         };
-        f.onkeyup = function(d) {
+        window.onkeyup = function(d) {
             32 == d.keyCode && (a = !1);
             87 == d.keyCode && (c = !1);
             81 == d.keyCode && b && (A(19), b = !1)
         };
-        f.onblur = function() {
+        window.onblur = function() {
             A(19);
             c = b = a = !1
         };
-        f.onresize = ka;
+        window.onresize = ka;
         ka();
-        f.requestAnimationFrame ? f.requestAnimationFrame(la) : setInterval(ba, 1E3 / 60);
+        window.requestAnimationFrame ? window.requestAnimationFrame(la) : setInterval(ba, 1E3 / 60);
         setInterval(G, 40);
-        ma(r("#region").val());
-        r("#overlays").show()
+        ma($("#region").val());
+        $("#overlays").show()
     }
     function za() {
         if (.5 > h)
@@ -65,12 +65,12 @@
         Q = (O - p / 2) / h + s;
         R = (P - m / 2) / h + t
     }
-    function ia() {
-        null == S && (S = {}, r("#region").children().each(function() {
-            var a = r(this), b = a.val();
+    function getServerInfo() {
+        null == S && (S = {}, $("#region").children().each(function() {
+            var a = $(this), b = a.val();
             b && (S[b] = a.text())
         }));
-        r.get("http://m.agar.io/info", function(a) {
+        $.get("http://m.agar.io/info", function(a) {
             var b = {}, c;
             for (c in a.regions) {
                 var d = 
@@ -79,29 +79,29 @@
                 b[d] += a.regions[c].numPlayers
             }
             for (c in b)
-                r('#region option[value="' + c + '"]').text(S[c] + " (" + b[c] + " players)")
+                $('#region option[value="' + c + '"]').text(S[c] + " (" + b[c] + " players)")
         }, "json")
     }
     function na() {
-        r("#adsBottom").hide();
-        r("#overlays").hide()
+        $("#adsBottom").hide();
+        $("#overlays").hide()
     }
     function ma(a) {
         a && a != I && (I = a, ca())
     }
-    function oa() {
+    function getSocketServerIPAndConnect() {
         console.log("Find " + I + J);
-        r.ajax("http://m.agar.io/", {error: function() {
-                setTimeout(oa, 1E3)
+        $.ajax("http://m.agar.io/", {error: function() {
+                setTimeout(getSocketServerIPAndConnect, 1E3)
             },success: function(a) {
                 a = a.split("\n");
-                pa("ws://" + a[0])
+                connectSocket("ws://" + a[0])
             },dataType: "text",method: "POST",cache: !1,crossDomain: !0,data: I + J || "?"})
     }
     function ca() {
-        I && (r("#connecting").show(), oa())
+        I && ($("#connecting").show(), getSocketServerIPAndConnect())
     }
-    function pa(a) {
+    function connectSocket(a) {
         if (l) {
             l.onopen = null;
             l.onmessage = null;
@@ -131,7 +131,7 @@
         }
     }
     function Aa(a) {
-        r("#connecting").hide();
+        $("#connecting").hide();
         console.log("socket open");
         a = new ArrayBuffer(5);
         var b = new DataView(a);
@@ -206,16 +206,16 @@
         var b = Math.random(), c = 1;
         da = !1;
         for (var d = a.getUint16(c, !0), c = c + 2, e = 0; e < d; ++e) {
-            var k = w[a.getUint32(c, !0)], f = w[a.getUint32(c + 4, !0)], c = c + 8;
-            k && f && 
-            (f.destroy(), f.ox = f.x, f.oy = f.y, f.oSize = f.size, f.nx = k.x, f.ny = k.y, f.nSize = f.size, f.updateTime = E)
+            var k = w[a.getUint32(c, !0)], Daf = w[a.getUint32(c + 4, !0)], c = c + 8;
+            k && Daf && 
+            (Daf.destroy(), Daf.ox = Daf.x, Daf.oy = Daf.y, Daf.oSize = Daf.size, Daf.nx = k.x, Daf.ny = k.y, Daf.nSize = Daf.size, Daf.updateTime = E)
         }
         for (; ; ) {
             d = a.getUint32(c, !0);
             c += 4;
             if (0 == d)
                 break;
-            for (var e = a.getFloat32(c, !0), c = c + 4, k = a.getFloat32(c, !0), c = c + 4, f = a.getFloat32(c, !0), c = c + 4, h = a.getUint8(c++), l = a.getUint8(c++), p = a.getUint8(c++), h = (h << 16 | l << 8 | p).toString(16); 6 > h.length; )
+            for (var e = a.getFloat32(c, !0), c = c + 4, k = a.getFloat32(c, !0), c = c + 4, Daf = a.getFloat32(c, !0), c = c + 4, h = a.getUint8(c++), l = a.getUint8(c++), p = a.getUint8(c++), h = (h << 16 | l << 8 | p).toString(16); 6 > h.length; )
                 h = "0" + h;
             var h = "#" + h, m = a.getUint8(c++), l = !!(m & 1), p = !!(m & 16);
             m & 2 && (c += 4);
@@ -228,12 +228,12 @@
                 m += String.fromCharCode(n)
             }
             n = null;
-            w.hasOwnProperty(d) ? (n = w[d], n.updatePos(), n.ox = n.x, n.oy = n.y, n.oSize = n.size, n.color = h) : (n = new sa(d, e, k, f, h, m), n.pX = e, n.pY = k);
+            w.hasOwnProperty(d) ? (n = w[d], n.updatePos(), n.ox = n.x, n.oy = n.y, n.oSize = n.size, n.color = h) : (n = new sa(d, e, k, Daf, h, m), n.pX = e, n.pY = k);
             n.isVirus = l;
             n.isAgitated = p;
             n.nx = e;
             n.ny = k;
-            n.nSize = f;
+            n.nSize = Daf;
             n.updateCode = b;
             n.updateTime = E;
             -1 != B.indexOf(d) && -1 == g.indexOf(n) && (document.getElementById("overlays").style.display = "none", g.push(n), 1 == g.length && (s = n.x, t = n.y))
@@ -246,7 +246,7 @@
             d = a.getUint32(c, !0), c += 4, w[d] && (w[d].updateCode = b);
         for (e = 0; e < q.length; e++)
             q[e].updateCode != b && q[e--].destroy();
-        da && 0 == g.length && r("#overlays").fadeIn(3E3)
+        da && 0 == g.length && $("#overlays").fadeIn(3E3)
     }
     function G() {
         if (ea()) {
@@ -275,11 +275,11 @@
     }
     function la() {
         ba();
-        f.requestAnimationFrame(la)
+        window.requestAnimationFrame(la)
     }
     function ka() {
-        p = f.innerWidth;
-        m = f.innerHeight;
+        p = window.innerWidth;
+        m = window.innerHeight;
         canvas.width = canvas2.width = p;
         canvas.height = canvas2.height = m;
         ba()
@@ -382,7 +382,7 @@
                         angEnd = c + u[b] * Math.PI * 2, a.fillStyle = Ia[b + 1], a.beginPath(), a.moveTo(100, 140), a.arc(100, 140, 80, c, angEnd, !1), a.fill(), c = angEnd
             }
     }
-    function sa(a, b, c, d, e, f) {
+    function sa(a, b, c, d, e, saf) {
         q.push(this);
         w[a] = this;
         this.id = a;
@@ -393,7 +393,7 @@
         this.points = [];
         this.pointsAcc = [];
         this.createPoints();
-        this.setName(f)
+        this.setName(saf)
     }
     function Y(a, b, c, d) {
         a && (this._size = a);
@@ -401,10 +401,10 @@
         this._stroke = !!c;
         d && (this._strokeColor = d)
     }
-    if ("agar.io" != f.location.hostname && "localhost" != f.location.hostname && "10.10.2.13" != f.location.hostname)
-        f.location = "http://agar.io/";
-    else if (f.top != f)
-        f.top.location = "http://agar.io/";
+    if ("agar.io" != window.location.hostname && "localhost" != window.location.hostname && "10.10.2.13" != window.location.hostname)
+        window.location = "http://agar.io/";
+    else if (window.top != window)
+        window.top.location = "http://agar.io/";
     else {
       var canvas,
           e,
@@ -447,7 +447,7 @@
           J = "",
           u = null,
           Ia = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
-          ja = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+          ja = "ontouchstart" in window && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
           ga = new Image;
 
         ga.src = "img/split.png";
@@ -456,36 +456,36 @@
             alert("You browser does not support this game, we recommend you to use Firefox to play this");
         else {
             var S = null;
-            f.setNick = function(a) {
+            window.setNick = function(a) {
                 na();
                 N = a;
                 qa();
                 D = 0
             };
-            f.setRegion = ma;
-            f.setSkins = function(a) {
+            window.setRegion = ma;
+            window.setSkins = function(a) {
                 va = a
             };
-            f.setNames = function(a) {
+            window.setNames = function(a) {
                 Z = a
             };
-            f.setDarkTheme = function(a) {
+            window.setDarkTheme = function(a) {
                 fa = a
             };
-            f.setColors = function(a) {
+            window.setColors = function(a) {
                 ha = a
             };
-            f.setShowMass = function(a) {
+            window.setShowMass = function(a) {
                 wa = a
             };
-            f.spectate = function() {
+            window.spectate = function() {
                 A(1);
                 na()
             };
-            f.setGameMode = function(a) {
+            window.setGameMode = function(a) {
                 a != J && (J = a, ca())
             };
-            f.connect = pa;
+            window.connect = connectSocket;
             var ta = -1, ua = -1, x = null, v = 1, X = null, F = {}, Ja = "poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;hitler;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;ussr;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;nazi;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;isis;doge;nasa;byzantium;imperial japan;french kingdom;somalia;turkey;mars;pokerface".split(";"), Ka = ["m'blob"];
             sa.prototype = {id: 0,points: null,pointsAcc: null,name: null,nameCache: null,sizeCache: null,x: 0,y: 0,size: 0,ox: 0,oy: 0,oSize: 0,nx: 0,ny: 0,nSize: 0,updateTime: 0,updateCode: 0,drawTime: 0,destroyed: !1,isVirus: !1,isAgitated: !1,wasSimpleDrawing: !0,destroy: function() {
                     var a;
@@ -526,15 +526,15 @@
                 },movePoints: function() {
                     this.createPoints();
                     for (var a = this.points, b = this.pointsAcc, c = a.length, d = 0; d < c; ++d) {
-                        var e = b[(d - 1 + c) % c], f = b[(d + 1) % c];
+                        var e = b[(d - 1 + c) % c], movePointsF = b[(d + 1) % c];
                         b[d] += (Math.random() - .5) * (this.isAgitated ? 3 : 1);
                         b[d] *= .7;
                         10 < b[d] && (b[d] = 10);
                         -10 > b[d] && (b[d] = -10);
-                        b[d] = (e + f + 8 * b[d]) / 10
+                        b[d] = (e + movePointsF + 8 * b[d]) / 10
                     }
                     for (var h = this, d = 0; d < c; ++d) {
-                        var g = a[d].v, e = a[(d - 1 + c) % c].v, f = a[(d + 1) % c].v;
+                        var g = a[d].v, e = a[(d - 1 + c) % c].v, movePointsF = a[(d + 1) % c].v;
                         if (15 < this.size && null != H) {
                             var l = !1, m = a[d].x, p = a[d].y;
                             H.retrieve2(m - 5, p - 5, 10, 10, function(a) {
@@ -546,12 +546,12 @@
                         g += b[d];
                         0 > g && (g = 0);
                         g = this.isAgitated ? (19 * g + this.size) / 20 : (12 * g + this.size) / 13;
-                        a[d].v = (e + f + 8 * g) / 10;
+                        a[d].v = (e + movePointsF + 8 * g) / 10;
                         e = 2 * Math.PI / c;
-                        f = this.points[d].v;
-                        this.isVirus && 0 == d % 2 && (f += 5);
-                        a[d].x = this.x + Math.cos(e * d) * f;
-                        a[d].y = this.y + Math.sin(e * d) * f
+                        movePointsF = this.points[d].v;
+                        this.isVirus && 0 == d % 2 && (movePointsF += 5);
+                        a[d].x = this.x + Math.cos(e * d) * movePointsF;
+                        a[d].y = this.y + Math.sin(e * d) * movePointsF
                     }
                 },updatePos: function() {
                     var a;
@@ -615,12 +615,12 @@
                             d.setSize(this.getNameSize());
                             b = Math.ceil(10 * h) / 10;
                             d.setScale(b);
-                            var d = d.render(), f = ~~(d.width / b), k = ~~(d.height / 
+                            var d = d.render(), drawf = ~~(d.width / b), k = ~~(d.height / 
                             b);
-                            e.drawImage(d, ~~this.x - ~~(f / 2), a - ~~(k / 2), f, k);
+                            e.drawImage(d, ~~this.x - ~~(drawf / 2), a - ~~(k / 2), drawf, k);
                             a += d.height / 2 / b + 4
                         }
-                        wa && (c || 0 == g.length && (!this.isVirus || this.isAgitated) && 20 < this.size) && (null == this.sizeCache && (this.sizeCache = new Y(this.getNameSize() / 2, "#FFFFFF", !0, "#000000")), c = this.sizeCache, c.setSize(this.getNameSize() / 2), c.setValue(~~(this.size * this.size / 100)), b = Math.ceil(10 * h) / 10, c.setScale(b), d = c.render(), f = ~~(d.width / b), k = ~~(d.height / b), e.drawImage(d, ~~this.x - ~~(f / 2), a - ~~(k / 2), f, k));
+                        wa && (c || 0 == g.length && (!this.isVirus || this.isAgitated) && 20 < this.size) && (null == this.sizeCache && (this.sizeCache = new Y(this.getNameSize() / 2, "#FFFFFF", !0, "#000000")), c = this.sizeCache, c.setSize(this.getNameSize() / 2), c.setValue(~~(this.size * this.size / 100)), b = Math.ceil(10 * h) / 10, c.setScale(b), d = c.render(), drawf = ~~(d.width / b), k = ~~(d.height / b), e.drawImage(d, ~~this.x - ~~(drawf / 2), a - ~~(k / 2), drawf, k));
                         e.restore()
                     }
                 }};
@@ -641,12 +641,12 @@
                     null == this._canvas && (this._canvas = document.createElement("canvas"), this._ctx = this._canvas.getContext("2d"));
                     if (this._dirty) {
                         this._dirty = !1;
-                        var a = this._canvas, b = this._ctx, c = this._value, d = this._scale, e = this._size, f = e + "px Ubuntu";
-                        b.font = f;
+                        var a = this._canvas, b = this._ctx, c = this._value, d = this._scale, e = this._size, font = e + "px Ubuntu";
+                        b.font = font;
                         var h = b.measureText(c).width, g = ~~(.2 * e);
                         a.width = (h + 6) * d;
                         a.height = (e + g) * d;
-                        b.font = f;
+                        b.font = font;
                         b.scale(d, d);
                         b.globalAlpha = 1;
                         b.lineWidth = 3;
@@ -657,7 +657,7 @@
                     }
                     return this._canvas
                 }};
-            f.onload = ya
+            window.onload = onload
         }
     }
 })(window, jQuery);
