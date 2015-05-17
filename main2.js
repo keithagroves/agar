@@ -2,7 +2,7 @@
     function ya() {
         ia();
         setInterval(ia, 18E4);
-        z = $ = document.getElementById("canvas");
+        z = canvas = document.getElementById("canvas");
         e = z.getContext("2d");
         z.onmousedown = function(a) {
             if (ja) {
@@ -280,8 +280,8 @@
     function ka() {
         p = f.innerWidth;
         m = f.innerHeight;
-        $.width = z.width = p;
-        $.height = z.height = m;
+        canvas.width = z.width = p;
+        canvas.height = z.height = m;
         ba()
     }
     function Ea() {
@@ -406,7 +406,50 @@
     else if (f.top != f)
         f.top.location = "http://agar.io/";
     else {
-        var $, e, z, p, m, H = null, l = null, s = 0, t = 0, B = [], g = [], w = {}, q = [], C = [], y = [], O = 0, P = 0, Q = -1, R = -1, Fa = 0, E = 0, N = null, T = 0, U = 0, V = 1E4, W = 1E4, h = 1, I = null, va = !0, Z = !0, ha = !1, da = !1, D = 0, fa = !1, wa = !1, K = s = ~~((T + V) / 2), L = t = ~~((U + W) / 2), M = 1, J = "", u = null, Ia = ["#333333", "#FF3333", "#33FF33", "#3333FF"], ja = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent), ga = new Image;
+      var canvas,
+          e,
+          z,
+          p,
+          m,
+          H = null,
+          l = null,
+          s = 0,
+          t = 0,
+          B = [],
+          g = [],
+          w = {},
+          q = [],
+          C = [],
+          y = [],
+          O = 0,
+          P = 0,
+          Q = -1,
+          R = -1,
+          Fa = 0,
+          E = 0,
+          N = null,
+          T = 0,
+          U = 0,
+          V = 1E4,
+          W = 1E4,
+          h = 1,
+          I = null,
+          va = !0,
+          Z = !0,
+          ha = !1,
+          da = !1,
+          D = 0,
+          fa = !1,
+          wa = !1,
+          K = s = ~~((T + V) / 2),
+          L = t = ~~((U + W) / 2),
+          M = 1,
+          J = "",
+          u = null,
+          Ia = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
+          ja = "ontouchstart" in f && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+          ga = new Image;
+
         ga.src = "img/split.png";
         var xa = document.createElement("canvas");
         if ("undefined" == typeof console || "undefined" == typeof DataView || "undefined" == typeof WebSocket || null == xa || null == xa.getContext)
