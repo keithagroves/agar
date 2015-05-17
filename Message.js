@@ -46,6 +46,8 @@ Message.prototype.parseElements = function parseElements() {
   while (this.view.getUint32(this.offset, true) !== 0) {
     this.parseElement();
   }
+  // +4 for the last id (0) we got
+  this.offset += 4;
 
   // Another padding byte...
   this.view.getUint16(this.offset, true);
@@ -89,23 +91,19 @@ Message.prototype.parseMaybeEaten = function parseMaybeEaten() {
 Message.prototype.parseElement = function parseElement() {
   var id = this.view.getUint32(this.offset, true);
   this.offset += 4;
-  var x = this.view.getFloat64(this.offset, true);
-  this.offset += 8;
-  var y = this.view.getFloat64(this.offset, true);
-  this.offset += 8;
-  var size = this.view.getFloat64(this.offset, true);
-  this.offset += 8;
-
-  // TODO(ibash) this is ignored in the minified code, maybe just a padding
-  // byte?
-  this.view.getUint8(this.offset);
-  this.offset += 1;
+  var x = this.view.getFloat32(this.offset, true);
+  this.offset += 4;
+  var y = this.view.getFloat32(this.offset, true);
+  this.offset += 4;
+  var size = this.view.getFloat32(this.offset, true);
+  this.offset += 4;
 
   var color = this.parseColor();
 
   var flags = this.view.getUint8(this.offset);
   this.offset += 1;
   var isVirus = !!(flags & 1);
+  var isAgitated = !!(flags & 16);
 
   // TODO(ibash) don't undestand this offsetting here, but it's in the
   // original code
@@ -121,7 +119,7 @@ Message.prototype.parseElement = function parseElement() {
 
   var name = this.parseName();
 
-  console.log({id: id, x: x, y: y, size: size, color: color, isVirus: isVirus, name: name});
+  console.log({id: id, x: x, y: y, size: size, color: color, isVirus: isVirus, isAgitated: isAgitated, name: name});
 };
 
 Message.prototype.parseAlive = function parseAlive() {
