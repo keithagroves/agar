@@ -8,15 +8,15 @@
             if (ja) {
                 var b = a.clientX - (5 + p / 5 / 2), c = a.clientY - (5 + p / 5 / 2);
                 if (Math.sqrt(b * b + c * c) <= p / 5 / 2) {
-                    G();
-                    A(17);
+                    sendMousePosition();
+                    sendCommand(17);
                     return
                 }
             }
             O = a.clientX;
             P = a.clientY;
             aa();
-            G()
+            sendMousePosition()
         };
         canvas2.onmousemove = function(a) {
             O = a.clientX;
@@ -25,26 +25,26 @@
         };
         canvas2.onmouseup = function(a) {
         };
-        var a = !1, b = !1, c = !1;
+        var a = false, b = false, c = false;
         window.onkeydown = function(d) {
-            32 != d.keyCode || a || (G(), A(17), a = !0);
-            81 != d.keyCode || b || (A(18), b = !0);
-            87 != d.keyCode || c || (G(), A(21), c = !0);
+            32 != d.keyCode || a || (sendMousePosition(), sendCommand(17), a = true);
+            81 != d.keyCode || b || (sendCommand(18), b = true);
+            87 != d.keyCode || c || (sendMousePosition(), sendCommand(21), c = true);
             27 == d.keyCode && $("#overlays").fadeIn(200)
         };
         window.onkeyup = function(d) {
-            32 == d.keyCode && (a = !1);
-            87 == d.keyCode && (c = !1);
-            81 == d.keyCode && b && (A(19), b = !1)
+            32 == d.keyCode && (a = false);
+            87 == d.keyCode && (c = false);
+            81 == d.keyCode && b && (sendCommand(19), b = false)
         };
         window.onblur = function() {
-            A(19);
-            c = b = a = !1
+            sendCommand(19);
+            c = b = a = false
         };
-        window.onresize = ka;
-        ka();
-        window.requestAnimationFrame ? window.requestAnimationFrame(la) : setInterval(ba, 1E3 / 60);
-        setInterval(G, 40);
+        window.onresize = onResize;
+        onResize();
+        window.requestAnimationFrame ? window.requestAnimationFrame(la) : setInterval(redraw, 1E3 / 60);
+        setInterval(sendMousePosition, 40);
         ma($("#region").val());
         $("#overlays").show()
     }
@@ -96,7 +96,7 @@
             },success: function(a) {
                 a = a.split("\n");
                 connectSocket("ws://" + a[0])
-            },dataType: "text",method: "POST",cache: !1,crossDomain: !0,data: I + J || "?"})
+            },dataType: "text",method: "POST",cache: false,crossDomain: true,data: I + J || "?"})
     }
     function ca() {
         I && ($("#connecting").show(), getSocketServerIPAndConnect())
@@ -136,12 +136,12 @@
         a = new ArrayBuffer(5);
         var b = new DataView(a);
         b.setUint8(0, 254);
-        b.setUint32(1, 1, !0);
+        b.setUint32(1, 1, true);
         l.send(a);
         a = new ArrayBuffer(5);
         b = new DataView(a);
         b.setUint8(0, 255);
-        b.setUint32(1, 1, !0);
+        b.setUint32(1, 1, true);
         l.send(a);
         qa()
     }
@@ -152,7 +152,7 @@
     function onSocketMessage(a) {
         function b() {
             for (var a = ""; ; ) {
-                var b = d.getUint16(c, !0);
+                var b = d.getUint16(c, true);
                 c += 2;
                 if (0 == b)
                     break;
@@ -166,63 +166,63 @@
                 Da(d);
                 break;
             case 17:
-                K = d.getFloat32(1, !0);
-                L = d.getFloat32(5, !0);
-                M = d.getFloat32(9, !0);
+                K = d.getFloat32(1, true);
+                L = d.getFloat32(5, true);
+                M = d.getFloat32(9, true);
                 break;
             case 20:
                 g = [];
                 B = [];
                 break;
             case 32:
-                B.push(d.getUint32(1, !0));
+                B.push(d.getUint32(1, true));
                 break;
             case 49:
                 if (null != u)
                     break;
-                a = d.getUint32(c, !0);
+                a = d.getUint32(c, true);
                 c += 4;
                 y = [];
                 for (var e = 0; e < a; ++e) {
-                    var k = d.getUint32(c, !0), c = c + 4;
+                    var k = d.getUint32(c, true), c = c + 4;
                     y.push({id: k,name: b()})
                 }
                 ra();
                 break;
             case 50:
                 u = [];
-                a = d.getUint32(c, !0);
+                a = d.getUint32(c, true);
                 c += 4;
                 for (e = 0; e < a; ++e)
-                    u.push(d.getFloat32(c, !0)), c += 4;
+                    u.push(d.getFloat32(c, true)), c += 4;
                 ra();
                 break;
             case 64:
-                T = d.getFloat64(1, !0), U = d.getFloat64(9, !0), V = d.getFloat64(17, !0), W = d.getFloat64(25, !0), K = (V + T) / 2, L = (W + U) / 2, M = 1, 0 == g.length && (s = K, t = L, h = M)
+                T = d.getFloat64(1, true), U = d.getFloat64(9, true), V = d.getFloat64(17, true), W = d.getFloat64(25, true), K = (V + T) / 2, L = (W + U) / 2, M = 1, 0 == g.length && (s = K, t = L, h = M)
         }
     }
     function Da(a) {
         E = +new Date;
         var b = Math.random(), c = 1;
-        da = !1;
-        for (var d = a.getUint16(c, !0), c = c + 2, e = 0; e < d; ++e) {
-            var k = w[a.getUint32(c, !0)], Daf = w[a.getUint32(c + 4, !0)], c = c + 8;
+        da = false;
+        for (var d = a.getUint16(c, true), c = c + 2, e = 0; e < d; ++e) {
+            var k = w[a.getUint32(c, true)], Daf = w[a.getUint32(c + 4, true)], c = c + 8;
             k && Daf && 
             (Daf.destroy(), Daf.ox = Daf.x, Daf.oy = Daf.y, Daf.oSize = Daf.size, Daf.nx = k.x, Daf.ny = k.y, Daf.nSize = Daf.size, Daf.updateTime = E)
         }
         for (; ; ) {
-            d = a.getUint32(c, !0);
+            d = a.getUint32(c, true);
             c += 4;
             if (0 == d)
                 break;
-            for (var e = a.getFloat32(c, !0), c = c + 4, k = a.getFloat32(c, !0), c = c + 4, Daf = a.getFloat32(c, !0), c = c + 4, h = a.getUint8(c++), l = a.getUint8(c++), p = a.getUint8(c++), h = (h << 16 | l << 8 | p).toString(16); 6 > h.length; )
+            for (var e = a.getFloat32(c, true), c = c + 4, k = a.getFloat32(c, true), c = c + 4, Daf = a.getFloat32(c, true), c = c + 4, h = a.getUint8(c++), l = a.getUint8(c++), p = a.getUint8(c++), h = (h << 16 | l << 8 | p).toString(16); 6 > h.length; )
                 h = "0" + h;
             var h = "#" + h, m = a.getUint8(c++), l = !!(m & 1), p = !!(m & 16);
             m & 2 && (c += 4);
             m & 4 && (c += 8);
             m & 8 && (c += 16);
             for (m = ""; ; ) {
-                var n = a.getUint16(c, !0), c = c + 2;
+                var n = a.getUint16(c, true), c = c + 2;
                 if (0 == n)
                     break;
                 m += String.fromCharCode(n)
@@ -238,20 +238,20 @@
             n.updateTime = E;
             -1 != B.indexOf(d) && -1 == g.indexOf(n) && (document.getElementById("overlays").style.display = "none", g.push(n), 1 == g.length && (s = n.x, t = n.y))
         }
-        a.getUint16(c, !0);
+        a.getUint16(c, true);
         c += 2;
-        k = a.getUint32(c, !0);
+        k = a.getUint32(c, true);
         c += 4;
         for (e = 0; e < k; e++)
-            d = a.getUint32(c, !0), c += 4, w[d] && (w[d].updateCode = b);
+            d = a.getUint32(c, true), c += 4, w[d] && (w[d].updateCode = b);
         for (e = 0; e < q.length; e++)
             q[e].updateCode != b && q[e--].destroy();
         da && 0 == g.length && $("#overlays").fadeIn(3E3)
     }
-    function G() {
+    function sendMousePosition() {
         if (ea()) {
             var a = O - p / 2, b = P - m / 2;
-            64 > a * a + b * b || ta == Q && ua == R || (ta = Q, ua = R, a = new ArrayBuffer(21), b = new DataView(a), b.setUint8(0, 16), b.setFloat64(1, Q, !0), b.setFloat64(9, R, !0), b.setUint32(17, 0, !0), l.send(a))
+            64 > a * a + b * b || ta == Q && ua == R || (ta = Q, ua = R, a = new ArrayBuffer(21), b = new DataView(a), b.setUint8(0, 16), b.setFloat64(1, Q, true), b.setFloat64(9, R, true), b.setUint32(17, 0, true), l.send(a))
         }
     }
     function qa() {
@@ -259,14 +259,14 @@
             var a = new ArrayBuffer(1 + 2 * N.length), b = new DataView(a);
             b.setUint8(0, 0);
             for (var c = 0; c < N.length; ++c)
-                b.setUint16(1 + 2 * c, N.charCodeAt(c), !0);
+                b.setUint16(1 + 2 * c, N.charCodeAt(c), true);
             l.send(a)
         }
     }
     function ea() {
         return null != l && l.readyState == l.OPEN
     }
-    function A(a) {
+    function sendCommand(a) {
         if (ea()) {
             var b = new ArrayBuffer(1);
             (new DataView(b)).setUint8(0, a);
@@ -274,15 +274,15 @@
         }
     }
     function la() {
-        ba();
+        redraw();
         window.requestAnimationFrame(la)
     }
-    function ka() {
+    function onResize() {
         p = window.innerWidth;
         m = window.innerHeight;
         canvas.width = canvas2.width = p;
         canvas.height = canvas2.height = m;
-        ba()
+        redraw()
     }
     function Ea() {
         if (0 != g.length) {
@@ -292,7 +292,7 @@
             h = (9 * h + a) / 10
         }
     }
-    function ba() {
+    function redraw() {
         var a = +new Date;
         ++Fa;
         E = +new Date;
@@ -379,7 +379,7 @@
                         c = y[b].name || "An unnamed cell", Z || (c = "An unnamed cell"), -1 != B.indexOf(y[b].id) ? (g[0].name && (c = g[0].name), a.fillStyle = "#FFAAAA") : a.fillStyle = "#FFFFFF", c = b + 1 + ". " + c, a.fillText(c, 100 - a.measureText(c).width / 2, 70 + 24 * b);
                 else
                     for (b = c = 0; b < u.length; ++b)
-                        angEnd = c + u[b] * Math.PI * 2, a.fillStyle = Ia[b + 1], a.beginPath(), a.moveTo(100, 140), a.arc(100, 140, 80, c, angEnd, !1), a.fill(), c = angEnd
+                        angEnd = c + u[b] * Math.PI * 2, a.fillStyle = Ia[b + 1], a.beginPath(), a.moveTo(100, 140), a.arc(100, 140, 80, c, angEnd, false), a.fill(), c = angEnd
             }
     }
     function sa(a, b, c, d, e, saf) {
@@ -434,13 +434,13 @@
           W = 1E4,
           h = 1,
           I = null,
-          va = !0,
-          Z = !0,
-          ha = !1,
-          da = !1,
+          va = true,
+          Z = true,
+          ha = false,
+          da = false,
           D = 0,
-          fa = !1,
-          wa = !1,
+          fa = false,
+          wa = false,
           K = s = ~~((T + V) / 2),
           L = t = ~~((U + W) / 2),
           M = 1,
@@ -479,7 +479,7 @@
                 wa = a
             };
             window.spectate = function() {
-                A(1);
+                sendCommand(1);
                 na()
             };
             window.setGameMode = function(a) {
@@ -487,7 +487,7 @@
             };
             window.connect = connectSocket;
             var ta = -1, ua = -1, x = null, v = 1, X = null, F = {}, Ja = "poland;usa;china;russia;canada;australia;spain;brazil;germany;ukraine;france;sweden;hitler;north korea;south korea;japan;united kingdom;earth;greece;latvia;lithuania;estonia;finland;norway;cia;maldivas;austria;nigeria;reddit;yaranaika;confederate;9gag;indiana;4chan;italy;ussr;bulgaria;tumblr;2ch.hk;hong kong;portugal;jamaica;german empire;mexico;sanik;switzerland;croatia;chile;indonesia;bangladesh;thailand;iran;iraq;peru;moon;botswana;bosnia;netherlands;european union;taiwan;pakistan;hungary;satanist;qing dynasty;nazi;matriarchy;patriarchy;feminism;ireland;texas;facepunch;prodota;cambodia;steam;piccolo;ea;india;kc;denmark;quebec;ayy lmao;sealand;bait;tsarist russia;origin;vinesauce;stalin;belgium;luxembourg;stussy;prussia;8ch;argentina;scotland;sir;romania;belarus;wojak;isis;doge;nasa;byzantium;imperial japan;french kingdom;somalia;turkey;mars;pokerface".split(";"), Ka = ["m'blob"];
-            sa.prototype = {id: 0,points: null,pointsAcc: null,name: null,nameCache: null,sizeCache: null,x: 0,y: 0,size: 0,ox: 0,oy: 0,oSize: 0,nx: 0,ny: 0,nSize: 0,updateTime: 0,updateCode: 0,drawTime: 0,destroyed: !1,isVirus: !1,isAgitated: !1,wasSimpleDrawing: !0,destroy: function() {
+            sa.prototype = {id: 0,points: null,pointsAcc: null,name: null,nameCache: null,sizeCache: null,x: 0,y: 0,size: 0,ox: 0,oy: 0,oSize: 0,nx: 0,ny: 0,nSize: 0,updateTime: 0,updateCode: 0,drawTime: 0,destroyed: false,isVirus: false,isAgitated: false,wasSimpleDrawing: true,destroy: function() {
                     var a;
                     for (a = 0; a < q.length; a++)
                         if (q[a] == this) {
@@ -496,16 +496,16 @@
                         }
                     delete w[this.id];
                     a = g.indexOf(this);
-                    -1 != a && (da = !0, g.splice(a, 1));
+                    -1 != a && (da = true, g.splice(a, 1));
                     a = B.indexOf(this.id);
                     -1 != a && B.splice(a, 1);
-                    this.destroyed = !0;
+                    this.destroyed = true;
                     C.push(this)
                 },getNameSize: function() {
                     return Math.max(~~(.3 * this.size), 24)
                 },setName: function(a) {
                     if (this.name = a)
-                        null == this.nameCache ? this.nameCache = new Y(this.getNameSize(), "#FFFFFF", !0, "#000000") : this.nameCache.setSize(this.getNameSize()), this.nameCache.setValue(this.name)
+                        null == this.nameCache ? this.nameCache = new Y(this.getNameSize(), "#FFFFFF", true, "#000000") : this.nameCache.setSize(this.getNameSize()), this.nameCache.setValue(this.name)
                 },createPoints: function() {
                     for (var a = this.getNumPoints(); this.points.length > a; ) {
                         var b = ~~(Math.random() * this.points.length);
@@ -536,11 +536,11 @@
                     for (var h = this, d = 0; d < c; ++d) {
                         var g = a[d].v, e = a[(d - 1 + c) % c].v, movePointsF = a[(d + 1) % c].v;
                         if (15 < this.size && null != H) {
-                            var l = !1, m = a[d].x, p = a[d].y;
+                            var l = false, m = a[d].x, p = a[d].y;
                             H.retrieve2(m - 5, p - 5, 10, 10, function(a) {
-                                a.c != h && 25 > (m - a.x) * (m - a.x) + (p - a.y) * (p - a.y) && (l = !0)
+                                a.c != h && 25 > (m - a.x) * (m - a.x) + (p - a.y) * (p - a.y) && (l = true)
                             });
-                            !l && (a[d].x < T || a[d].y < U || a[d].x > V || a[d].y > W) && (l = !0);
+                            !l && (a[d].x < T || a[d].y < U || a[d].x > V || a[d].y > W) && (l = true);
                             l && (0 < b[d] && (b[d] = 0), b[d] -= 1)
                         }
                         g += b[d];
@@ -569,7 +569,7 @@
                     return a
                 },shouldRender: function() {
                     return this.x + this.size + 40 < s - p / 2 / h || this.y + this.size + 40 < t - m / 2 / h || this.x - this.size - 40 > s + p / 
-                    2 / h || this.y - this.size - 40 > t + m / 2 / h ? !1 : !0
+                    2 / h || this.y - this.size - 40 > t + m / 2 / h ? false : true
                 },draw: function() {
                     if (this.shouldRender()) {
                         var a = !this.isVirus && !this.isAgitated && .5 > h;
@@ -586,7 +586,7 @@
                         e.lineJoin = this.isVirus ? "mitter" : "round";
                         ha ? (e.fillStyle = "#FFFFFF", e.strokeStyle = "#AAAAAA") : (e.fillStyle = this.color, e.strokeStyle = this.color);
                         if (a)
-                            e.beginPath(), e.arc(this.x, this.y, this.size, 0, 2 * Math.PI, !1);
+                            e.beginPath(), e.arc(this.x, this.y, this.size, 0, 2 * Math.PI, false);
                         else {
                             this.movePoints();
                             e.beginPath();
@@ -600,7 +600,7 @@
                         e.closePath();
                         b = this.name.toLowerCase();
                         !this.isAgitated && va && "" == J ? -1 != Ja.indexOf(b) ? (F.hasOwnProperty(b) || (F[b] = new Image, F[b].src = "skins/" + b + ".png"), c = 0 != F[b].width && F[b].complete ? F[b] : null) : c = null : c = null;
-                        b = c ? -1 != Ka.indexOf(b) : !1;
+                        b = c ? -1 != Ka.indexOf(b) : false;
                         a || e.stroke();
                         e.fill();
                         null == c || b || (e.save(), e.clip(), e.drawImage(c, this.x - this.size, this.y - this.size, 2 * this.size, 2 * this.size), e.restore());
@@ -620,27 +620,27 @@
                             e.drawImage(d, ~~this.x - ~~(drawf / 2), a - ~~(k / 2), drawf, k);
                             a += d.height / 2 / b + 4
                         }
-                        wa && (c || 0 == g.length && (!this.isVirus || this.isAgitated) && 20 < this.size) && (null == this.sizeCache && (this.sizeCache = new Y(this.getNameSize() / 2, "#FFFFFF", !0, "#000000")), c = this.sizeCache, c.setSize(this.getNameSize() / 2), c.setValue(~~(this.size * this.size / 100)), b = Math.ceil(10 * h) / 10, c.setScale(b), d = c.render(), drawf = ~~(d.width / b), k = ~~(d.height / b), e.drawImage(d, ~~this.x - ~~(drawf / 2), a - ~~(k / 2), drawf, k));
+                        wa && (c || 0 == g.length && (!this.isVirus || this.isAgitated) && 20 < this.size) && (null == this.sizeCache && (this.sizeCache = new Y(this.getNameSize() / 2, "#FFFFFF", true, "#000000")), c = this.sizeCache, c.setSize(this.getNameSize() / 2), c.setValue(~~(this.size * this.size / 100)), b = Math.ceil(10 * h) / 10, c.setScale(b), d = c.render(), drawf = ~~(d.width / b), k = ~~(d.height / b), e.drawImage(d, ~~this.x - ~~(drawf / 2), a - ~~(k / 2), drawf, k));
                         e.restore()
                     }
                 }};
-            Y.prototype = {_value: "",_color: "#000000",_stroke: !1,
-                _strokeColor: "#000000",_size: 16,_canvas: null,_ctx: null,_dirty: !1,_scale: 1,setSize: function(a) {
-                    this._size != a && (this._size = a, this._dirty = !0)
+            Y.prototype = {_value: "",_color: "#000000",_stroke: false,
+                _strokeColor: "#000000",_size: 16,_canvas: null,_ctx: null,_dirty: false,_scale: 1,setSize: function(a) {
+                    this._size != a && (this._size = a, this._dirty = true)
                 },setScale: function(a) {
-                    this._scale != a && (this._scale = a, this._dirty = !0)
+                    this._scale != a && (this._scale = a, this._dirty = true)
                 },setColor: function(a) {
-                    this._color != a && (this._color = a, this._dirty = !0)
+                    this._color != a && (this._color = a, this._dirty = true)
                 },setStroke: function(a) {
-                    this._stroke != a && (this._stroke = a, this._dirty = !0)
+                    this._stroke != a && (this._stroke = a, this._dirty = true)
                 },setStrokeColor: function(a) {
-                    this._strokeColor != a && (this._strokeColor = a, this._dirty = !0)
+                    this._strokeColor != a && (this._strokeColor = a, this._dirty = true)
                 },setValue: function(a) {
-                    a != this._value && (this._value = a, this._dirty = !0)
+                    a != this._value && (this._value = a, this._dirty = true)
                 },render: function() {
                     null == this._canvas && (this._canvas = document.createElement("canvas"), this._ctx = this._canvas.getContext("2d"));
                     if (this._dirty) {
-                        this._dirty = !1;
+                        this._dirty = false;
                         var a = this._canvas, b = this._ctx, c = this._value, d = this._scale, e = this._size, font = e + "px Ubuntu";
                         b.font = font;
                         var h = b.measureText(c).width, g = ~~(.2 * e);
