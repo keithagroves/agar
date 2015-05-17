@@ -123,14 +123,14 @@
         console.log("Connecting to " + a);
         l = new WebSocket(a);
         l.binaryType = "arraybuffer";
-        l.onopen = Aa;
-        l.onmessage = Ba;
-        l.onclose = Ca;
+        l.onopen = onSocketOpen;
+        l.onmessage = onSocketMessage;
+        l.onclose = onSocketClose;
         l.onerror = function() {
             console.log("socket error")
         }
     }
-    function Aa(a) {
+    function onSocketOpen(a) {
         $("#connecting").hide();
         console.log("socket open");
         a = new ArrayBuffer(5);
@@ -145,11 +145,11 @@
         l.send(a);
         qa()
     }
-    function Ca(a) {
+    function onSocketClose(a) {
         console.log("socket close");
         setTimeout(ca, 500)
     }
-    function Ba(a) {
+    function onSocketMessage(a) {
         function b() {
             for (var a = ""; ; ) {
                 var b = d.getUint16(c, !0);
