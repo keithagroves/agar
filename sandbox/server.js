@@ -20,32 +20,42 @@ app.listen(HTTP_PORT);
 
 // Web socket proxy sever.
 var wss = new WebSocketServer({port: WEBSOCKET_PORT});
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(client) {
   console.log('Got websocket connection, proxying.');
 
   var initialIncomingBuffer = [];
-  var out = new WebSocket(AGAR_SERVER, {origin: 'http://agar.io'});
-  var isOutOpen = false;
+  var backend = new WebSocket(AGAR_SERVER, {origin: 'http://agar.io'});
 
-  out.on('open', function() {
-    isOutOpen = true;
+  backend.on('open', function() {
     while (initialIncomingBuffer.length) {
-      out.send(initialIncomingBuffer.pop());
+      backend.send(initialIncomingBuffer.pop());
     }
   });
 
-  ws.on('message', function(message) {
+  client.on('message', function(message) {
     //console.log('received: %s', message.toString('hex'));
-    if (isOutOpen) {
-      out.send(message);
-    } else {
+    if (backend.readyState === WebSocket.OPEN) {
+      backend.send(message);
+    } else if (backend.readyState === WebSocket.CONNECTING) {
       initialIncomingBuffer.push(message);
     }
   });
 
-  out.on('message', function(message) {
+  backend.on('message', function(message) {
     //console.log('wrote: %s', message.toString('hex'));
-    ws.send(message);
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  });
+
+  client.on('close', function() {
+    console.log('client disconnected');
+    backend.close();
+  });
+
+  backend.on('close', function() {
+    console.log('backend disconnected');
+    client.close();
   });
 });
 
