@@ -4,14 +4,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Eat cells smaller than you and don't get eaten by the bigger ones, as an MMO">
+    <meta name="keywords" content="agario, agar, io, cell, cells, virus, bacteria, blob, game, games, web game, html5, fun, flash">
+    <meta name="robots" content="index, follow">
     <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Agar.io</title>
-    <link href="bootstrap.min.css" rel="stylesheet">
-    <style>body{padding:0;margin:0;overflow:hidden;}#canvas{position:absolute;left:0;right:0;top:0;bottom:0;width:100%;height:100%;}.checkbox label{margin-right:10px;}form{margin-bottom:0px;}.btn-play,.btn-settings,.btn-spectate{display:block;height:35px;}.btn-play{width:85%;float:left;}.btn-settings{width:13%;float:right;}.btn-spectate{display:block;float:right;}#adsBottom{position:absolute;left:0;right:0;bottom:0;z-index:2;}#adsBottomInner{margin:0px auto;width:728px;height:90px;border:5px solid white;border-radius:5px 5px 0px 0px;background-color:#FFFFFF;box-sizing:content-box;}.region-message{display:none;margin-bottom:12px;margin-left:6px;margin-right:6px;text-align:center;}@media screen and (max-height: 800px) {#adsBottom{display:none;}}</style>
+    <script type="text/javascript">
+      //<![CDATA[
+      try{if (!window.CloudFlare) {var CloudFlare=[{verbose:0,p:1431711471,byc:0,owlid:"cf",bag2:1,mirage2:0,oracle:0,paths:{cloudflare:"/cdn-cgi/nexp/dok3v=1613a3a185/"},atok:"c170bc6bd17c18ac01519b8e400e13b6",petok:"2c958575f0201ba2632dd2a51273daca2dc91e71-1432237645-1800",zone:"agar.io",rocket:"0",apps:{}}];CloudFlare.push({"apps":{"ape":"1cbabd3680ea872c1a1a4b412f751cd7"}});!function(a,b){a=document.createElement("script"),b=document.getElementsByTagName("script")[0],a.async=!0,a.src="//ajax.cloudflare.com/cdn-cgi/nexp/dok3v=7e13c32551/cloudflare.min.js",b.parentNode.insertBefore(a,b)}()}}catch(e){};
+      //]]>
+    </script>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:700' rel='stylesheet' type='text/css'>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="jquery.js"></script>
+    <script src="quadtree.js"></script>
+    <script src="main_out.js"></script>
+    <style>body{padding:0;margin:0;overflow:hidden;}#canvas{position:absolute;left:0;right:0;top:0;bottom:0;width:100%;height:100%;}.checkbox label{margin-right:10px;}form{margin-bottom:0px;}.btn-play,.btn-settings,.btn-spectate{display:block;height:35px;}.btn-play{width:85%;float:left;}.btn-settings{width:13%;float:right;}.btn-spectate{display:block;float:right;}#adsBottom{position:absolute;left:0;right:0;bottom:0;z-index:2;}#adsBottomInner{margin:0px auto;width:728px;height:90px;border:5px solid white;border-radius:5px 5px 0px 0px;background-color:#FFFFFF;box-sizing:content-box;}.region-message{display:none;margin-bottom:12px;margin-left:6px;margin-right:6px;text-align:center;}#region{width:65%;float:left;}#gamemode{width:33%;float:right;}@media screen and (max-height: 800px) {#adsBottom{display:none;}}</style>
   </head>
   <body>
-    <div id="overlays" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 2;">
+    <div id="overlays" style="display:none; position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 2;">
       <div id="helloDialog" style="width: 350px; background-color: #FFFFFF; margin: 100px auto; border-radius: 15px; padding: 5px 15px 5px 15px;">
         <form role="form">
           <div class="form-group">
@@ -33,6 +44,11 @@
               <option value="CN-China">China</option>
               <option value="SG-Singapore">Oceania</option>
             </select>
+            <select id="gamemode" class="form-control" onchange="setGameMode($(this).val());" required>
+              <option selected value="">FFA</option>
+              <option value=":teams">Teams</option>
+            </select>
+            <br clear="both"/>
           </div>
           <div>
             <div class="text-muted region-message CN-China">
@@ -60,11 +76,16 @@
             Move your mouse to control your cell.<br/>
             Press <b>Space</b> to split.<br/>
             Press <b>W</b> to eject some mass<br/>
-        </span></center>
-        <hr/>
-        <img id="blocker" width="320" height="100" src="blocker.png" style="display:none;border-radius:5px;"/>
-        <hr style="margin-bottom: 7px; "/>
-        <br clear="both"/>
+          </span></center>
+          <hr/>
+          <img id="blocker" width="320" height="100" src="blocker.png" style="display:none;border-radius:5px;"/>
+          <hr style="margin-bottom: 7px; "/>
+          <div style="margin-bottom: 5px; float: left; line-height: 32px; margin-left: 6px; height: 32px;">
+            <a href="privacy.txt" class="text-muted">Privacy Policy</a>
+            |
+            <a href="changelog.txt" class="text-muted">Changelog</a>
+          </div>
+          <br clear="both"/>
       </div>
     </div>
     <div id="connecting" style="display:none;position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 1; background-color: rgba(0,0,0,0.5);">
@@ -75,8 +96,5 @@
     </div>
     <canvas id="canvas" width="800" height="600"></canvas>
     <div style="font-family:'Ubuntu'">&nbsp;</div>
-    <script src="jquery.js"></script>
-    <script src="quadtree.js"></script>
-    <script src="main_out.js"></script>
   </body>
 </html>
