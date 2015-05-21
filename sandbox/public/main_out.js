@@ -110,6 +110,10 @@
 
     function oa() {
         console.log("Find " + I + J);
+        // Connect to proxy server instead
+        pa("ws://127.0.0.1:8080")
+
+        /*
         r.ajax("http://m.agar.io/", {
             error: function () {
                 setTimeout(oa, 1E3)
@@ -124,6 +128,7 @@
             crossDomain: !0,
             data: I + J || "?"
         })
+       */
     }
 
     function ca() {
