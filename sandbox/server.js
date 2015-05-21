@@ -9,8 +9,8 @@ var express = require('express');
 var WebSocket = require('ws');
 var WebSocketServer = require('ws').Server;
 
-var AGAR_SERVER = 'ws://23.239.23.225:443/';
-var HTTP_PORT = 80;
+var AGAR_SERVER = 'ws://45.79.94.67:443/';
+var HTTP_PORT = 8888;
 var WEBSOCKET_PORT = 8080;
 
 // Serve static assets.
@@ -35,6 +35,7 @@ wss.on('connection', function connection(ws) {
   });
 
   ws.on('message', function(message) {
+    //console.log('received: %s', message.toString('hex'));
     if (isOutOpen) {
       out.send(message);
     } else {
@@ -43,6 +44,7 @@ wss.on('connection', function connection(ws) {
   });
 
   out.on('message', function(message) {
+    //console.log('wrote: %s', message.toString('hex'));
     ws.send(message);
   });
 });
