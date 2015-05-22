@@ -295,6 +295,8 @@
     }
 
     function G() {
+      // Disable sending mouse position from the client.
+      // return;
         if (ea()) {
             var a = O - p / 2,
                 b = P - m / 2;

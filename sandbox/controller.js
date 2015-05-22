@@ -12,7 +12,7 @@ var WebSocket = require('ws');
 
 var COMMANDS = {
   SPLIT: 17,
-  EJECT_MASS: 21
+  EJECT_MASS: 21,
   // 18 / 19 seem like they could be to clear the last action? I'm not entirely
   // sure, they're mapped to a keypress of the q key and 19 is also mapped to an onblur
   QUIT: 18,
@@ -41,7 +41,6 @@ Controller.prototype.ejectMass = function ejectMass() {
 
 Controller.prototype.sendCommand = function sendCommand(command) {
   if (this.backend.readyState !== WebSocket.OPEN) {
-    throw new Error('Backend not connected');
     return;
   }
 
@@ -52,29 +51,38 @@ Controller.prototype.sendCommand = function sendCommand(command) {
 }
 
 /**
- * sendMousePosition
+ * sendPosition
  *
  * Sends position of mouse relative to origin.
  * x and y should range from ~ -350 to +350, tested emprically.
  *
+ * TODO ibash == fix this reayy we should be sending a new absolut position, but
+ * we should listen to the backend to get our actual set position (which is code
+ * 64!)
+ *
  * @param {number} x X Position to send to backend
  * @param {number} y Y Position to send to backen
  */
-Controller.prototype.sendMousePosition = function sendMousePosition(x, y) {
+Controller.prototype.sendPosition = function sendPosition(x, y) {
   if (this.backend.readyState !== WebSocket.OPEN) {
-    throw new Error('Backend not connected');
     return;
   }
 
+  /*
   if (64 > x * x + y * y) {
     // Not sure what this is guarding against... possibly just the mouse being
     // on the player itself.
     return;
   }
+ */
+  /*
   if (this.lastMouseX === x && this.lastMouseY === y) {
     // No position change.
     return;
   }
+ */
+
+  console.log('sending the mouse position', x, y);
 
   this.lastMouseX = x;
   this.lastMouseY = y;
