@@ -9,46 +9,41 @@
     <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Agar.io</title>
-    <script type="text/javascript">
-      //<![CDATA[
-      try{if (!window.CloudFlare) {var CloudFlare=[{verbose:0,p:1431711471,byc:0,owlid:"cf",bag2:1,mirage2:0,oracle:0,paths:{cloudflare:"/cdn-cgi/nexp/dok3v=1613a3a185/"},atok:"c170bc6bd17c18ac01519b8e400e13b6",petok:"2c958575f0201ba2632dd2a51273daca2dc91e71-1432237645-1800",zone:"agar.io",rocket:"0",apps:{}}];CloudFlare.push({"apps":{"ape":"1cbabd3680ea872c1a1a4b412f751cd7"}});!function(a,b){a=document.createElement("script"),b=document.getElementsByTagName("script")[0],a.async=!0,a.src="//ajax.cloudflare.com/cdn-cgi/nexp/dok3v=7e13c32551/cloudflare.min.js",b.parentNode.insertBefore(a,b)}()}}catch(e){};
-      //]]>
-    </script>
     <link href='http://fonts.googleapis.com/css?family=Ubuntu:700' rel='stylesheet' type='text/css'>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <script src="jquery.js"></script>
     <script src="quadtree.js"></script>
     <script src="main_out.js"></script>
-    <style>body{padding:0;margin:0;overflow:hidden;}#canvas{position:absolute;left:0;right:0;top:0;bottom:0;width:100%;height:100%;}.checkbox label{margin-right:10px;}form{margin-bottom:0px;}.btn-play,.btn-settings,.btn-spectate{display:block;height:35px;}.btn-play{width:85%;float:left;}.btn-settings{width:13%;float:right;}.btn-spectate{display:block;float:right;}#adsBottom{position:absolute;left:0;right:0;bottom:0;z-index:2;}#adsBottomInner{margin:0px auto;width:728px;height:90px;border:5px solid white;border-radius:5px 5px 0px 0px;background-color:#FFFFFF;box-sizing:content-box;}.region-message{display:none;margin-bottom:12px;margin-left:6px;margin-right:6px;text-align:center;}#region{width:65%;float:left;}#gamemode{width:33%;float:right;}@media screen and (max-height: 800px) {#adsBottom{display:none;}}</style>
+    <style>body{padding:0;margin:0;overflow:hidden;}#canvas{position:absolute;left:0;right:0;top:0;bottom:0;width:100%;height:100%;}.checkbox label{margin-right:10px;}form{margin-bottom:0px;}.btn-play,.btn-settings,.btn-spectate{display:block;height:35px;}.btn-play{width:85%;float:left;}.btn-settings{width:13%;float:right;}.btn-spectate{display:block;float:right;}#adsBottom{position:absolute;left:0;right:0;bottom:0;}#adsBottomInner{margin:0px auto;width:728px;height:90px;border:5px solid white;border-radius:5px 5px 0px 0px;background-color:#FFFFFF;box-sizing:content-box;}.region-message{display:none;margin-bottom:12px;margin-left:6px;margin-right:6px;text-align:center;}#nick,#locationKnown #region{width:65%;float:left;}#locationUnknown #region{margin-bottom:15px;}#gamemode,#spectateBtn{width:33%;float:right;}#helloDialog{width:350px;background-color:#FFFFFF;margin:10px auto;border-radius:15px;padding:5px 15px 5px 15px;position:absolute;top:50%;left:50%;margin-right:-50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);}</style>
   </head>
   <body>
-    <div id="overlays" style="display:none; position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 2;">
-      <div id="helloDialog" style="width: 350px; background-color: #FFFFFF; margin: 100px auto; border-radius: 15px; padding: 5px 15px 5px 15px;">
+    <div id="overlays" style="display:none; position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 200;">
+      <div id="helloDialog" style="">
         <form role="form">
           <div class="form-group">
-            <h2><center>Hello</center></h2>
+            <h2><center>Agar.io</center></h2>
           </div>
           <div class="form-group">
-            <p>Type your nick or leave it empty:</p>
             <input id="nick" class="form-control" placeholder="Nick" maxlength="14"/>
+            <select id="gamemode" class="form-control" onchange="setGameMode($(this).val());" required>
+              <option selected value="">FFA</option>
+              <option value=":teams">Teams</option>
+            </select>
+            <br clear="both"/>
           </div>
-          <div class="form-group">
-            <select id="region" class="form-control" onchange="setRegion($('#region').val());$('.region-message').hide();$('.region-message.'+$('#region').val()).show();$('.btn-needs-server').prop('disabled', false);" required>
+          <div id="locationUnknown">
+            <select id="region" class="form-control" onchange="setRegion($('#region').val());" required>
               <option selected disabled value=""> -- Select a Region -- </option>
               <option value="US-Fremont">US West</option>
               <option value="US-Atlanta">US East</option>
               <option value="BR-Brazil">South America</option>
               <option value="EU-London">Europe</option>
               <option value="RU-Russia">Russia</option>
+              <option value="TK-Turkey">Turkey</option>
               <option value="JP-Tokyo">East Asia</option>
               <option value="CN-China">China</option>
               <option value="SG-Singapore">Oceania</option>
             </select>
-            <select id="gamemode" class="form-control" onchange="setGameMode($(this).val());" required>
-              <option selected value="">FFA</option>
-              <option value=":teams">Teams</option>
-            </select>
-            <br clear="both"/>
           </div>
           <div>
             <div class="text-muted region-message CN-China">
@@ -57,11 +52,15 @@
           </div>
           <div class="form-group">
             <button disabled type="submit" id="playBtn" onclick="setNick(document.getElementById('nick').value); return false;" class="btn btn-play btn-primary btn-needs-server">Play</button>
-            <button onclick="$('#settings').toggle(); return false;" class="btn btn-info btn-settings"><i class="glyphicon glyphicon-cog"></i></button>
+            <button onclick="$('#settings, #instructions').toggle();return false;" class="btn btn-info btn-settings"><i class="glyphicon glyphicon-cog"></i></button>
             <br clear="both"/>
           </div>
           <div id="settings" class="checkbox" style="display:none;">
-            <button onclick="spectate(); return false;" disabled class="btn btn-warning btn-spectate btn-needs-server">Spectate</button>
+            <div class="form-group">
+              <div id="locationKnown"></div>
+              <button id="spectateBtn" onclick="spectate(); return false;" disabled class="btn btn-warning btn-spectate btn-needs-server">Spectate</button>
+              <br clear="both"/>
+            </div>
             <div style="margin: 6px;">
               <label><input type="checkbox" onchange="setSkins(!$(this).is(':checked'));"> No skins</label>
               <label><input type="checkbox" onchange="setNames(!$(this).is(':checked'));"> No names</label>
@@ -71,24 +70,25 @@
             </div>
           </div>
         </form>
-        <hr/>
-        <center><span class="text-muted">
-            Move your mouse to control your cell.<br/>
-            Press <b>Space</b> to split.<br/>
-            Press <b>W</b> to eject some mass<br/>
-          </span></center>
+        <div id="instructions">
           <hr/>
-          <img id="blocker" width="320" height="100" src="blocker.png" style="display:none;border-radius:5px;"/>
-          <hr style="margin-bottom: 7px; "/>
-          <div style="margin-bottom: 5px; float: left; line-height: 32px; margin-left: 6px; height: 32px;">
-            <a href="privacy.txt" class="text-muted">Privacy Policy</a>
-            |
-            <a href="changelog.txt" class="text-muted">Changelog</a>
-          </div>
-          <br clear="both"/>
+          <center><span class="text-muted">
+              Move your mouse to control your cell<br/>
+              Press <b>Space</b> to split<br/>
+              Press <b>W</b> to eject some mass<br/>
+            </span></center>
+        </div>
+        <hr/>
+        <hr style="margin-bottom: 7px; "/>
+        <div style="margin-bottom: 5px; float: left; line-height: 32px; margin-left: 6px; height: 32px;">
+          <a href="privacy.txt" class="text-muted">Privacy Policy</a>
+          |
+          <a href="changelog.txt" class="text-muted">Changelog</a>
+        </div>
+        <br clear="both"/>
       </div>
     </div>
-    <div id="connecting" style="display:none;position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 1; background-color: rgba(0,0,0,0.5);">
+    <div id="connecting" style="display:none;position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 100; background-color: rgba(0,0,0,0.5);">
       <div style="width: 350px; background-color: #FFFFFF; margin: 100px auto; border-radius: 15px; padding: 5px 15px 5px 15px;">
         <h2>Connecting</h2>
         <p> If you cannot connect to the servers, check if you have some anti virus or firewall blocking the connection.
