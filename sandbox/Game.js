@@ -7,6 +7,7 @@ var WebSocket = require('ws');
 //var Agent = require('./Agent');
 //var Controller = require('./Controller');
 //var Message = require('./Message');
+var parser = require('./parser');
 
 var AGAR_SERVER = 'ws://45.79.73.78:443/';
 
@@ -21,6 +22,8 @@ function Game(client) {
   this.client = client;
   this.backend = new WebSocket(AGAR_SERVER, {origin: 'http://agar.io'});
   this.initialIncomingBuffer = [];
+  this.currentUserId = null;
+  this.players = {};
 
   this.client.on('message', this.onClientMessage);
   this.client.on('close', this.onClientClose);
@@ -28,6 +31,9 @@ function Game(client) {
   this.backend.on('open', this.onBackendOpen);
   this.backend.on('message', this.onBackendMessage);
   this.backend.on('close', this.onBackendClose);
+
+  this.drawLoop();
+
 }
 module.exports = Game;
 
@@ -79,13 +85,12 @@ Game.prototype.onBackendMessage = function onBackendMessage(data) {
     this.client.send(data);
   }
 
-  /*
-  var message = new Message(data);
-  var parsed = message.parse();
-  if (message.getType() === Message.TYPES.POSITION) {
-    console.log(parsed);
+  var message = parser.parse(data);
+  if (message.type === parser.TYPES.USER_ID) {
+    this.currentUserId = message.data.id
+  } else if (message.type === parser.TYPES.UPDATES) {
+    this.processUpdates(message.data);
   }
- */
 };
 
 Game.prototype.onBackendClose = function onBackendClose() {
@@ -93,3 +98,60 @@ Game.prototype.onBackendClose = function onBackendClose() {
   this.client.close();
   //this.agent.stop();
 };
+ 
+Game.prototype.processUpdates = function processUpdates(updates) {
+  // There are 3 types of data on the updates:
+  // consumptions: Not exactly sure what this is yet, but I think it's when one
+  //   player eats another
+  // positions: Current position / size of players
+  // pings: Player ids that are still alive / should be kept alive
+  //
+  // If an update comes in, and an id is not included in positions or pings then
+  // we assume that the player is gone (they are either off screen or don't
+  // exist anymore).
+
+  var self = this;
+  var newPlayers = {};
+
+  _.each(updates.consumptions, function(consumption) {
+    if (self.players[consumption.consumedId]) {
+      delete self.players[consumption.consumedId];
+    }
+  });
+
+  _.each(updates.positions, function(position) {
+    newPlayers[position.id] = position;
+  });
+
+  _.each(updates.pings, function(id) {
+    if (self.players[id]) {
+      newPlayers[id] = self.players[id];
+    }
+  });
+
+  this.players = newPlayers;
+};
+
+Game.prototype.drawLoop = function drawLoop() {
+  this.draw();
+  setTimeout(this.drawLoop.bind(this), 500);
+};
+
+Game.prototype.draw = function draw() {
+  //var lines = process.stdout.getWindowSize()[1];
+  //for(var i = 0; i < lines; i++) {
+    //console.log('\r\n');
+  //}
+
+  var gnuplot = require('child_process').spawn('gnuplot');
+  gnuplot.stdin.write('set term dumb\n');
+  gnuplot.stdin.write("plot '-'\n");
+  _.each(this.players, function(player) {
+    gnuplot.stdin.write(player.data.nX + ' ' + player.data.nY + '\n');
+  });
+  gnuplot.stdin.write('e\n');
+
+  gnuplot.stdout.on('data', function(chunk) {
+    console.log(chunk.toString('utf8'));
+  });
+}; 
